@@ -17,10 +17,12 @@ def add_to_graph(g: dict, path : str, num: int):
     for idx in range(5, len(li) - 1):
         dname = li[idx]
         if not dname in curr:
-            curr[dname] = {}
+            curr[dname] = { '__name' : dname }
         curr = curr[dname]
-    curr['file'] = fname
-    curr['count'] = num
+
+    curr[fname] = num
+    # curr['file'] = fname
+    # curr['count'] = num
 
 def kwdcount_file(kwd : str, p : str):
     c = 0
@@ -31,7 +33,7 @@ def kwdcount_file(kwd : str, p : str):
     return c
 
 def get_graph(root : str):
-    graph = {}
+    graph = { '__name' : 'root' }
     
     for path in Path(root).rglob('*.c'):
         ppath = path.as_posix()
@@ -55,25 +57,26 @@ def d3_add_link(d3_nodes : list, node1 : str, node2 : str):
 
 def make_d3_json(g: dict):
     d3_graph = { 'nodes' : [], 'links' : [] }
+    d3_add_node(d3_graph['nodes'], 'root', 1)
 
     # DFS traversal
     stack = [g]
     
     while len(stack) != 0:
         e = stack.pop()
-        if not isinstance(e, dict):
-            print(f'err e is not dict {e} {e.type()}')
-            continue
-        else:
-            for k, v in e.items():
-                print(f'{k}:{v}')
-                if is_leafnode(v):
-                    d3_add_node(d3_graph['nodes'], v['file'], v['count'])
-                    d3_add_link(d3_graph['links'], k, v['file'])
-                else:
-                    d3_add_node(d3_graph['nodes'], k, 1)
-                    d3_add_link(d3_graph['links'], k, ck)
-                    stack.append(v)
+        for k, v in e.items():
+            if k == '__name':
+                continue
+
+            print(f'{k}:{v}')
+            if isinstance(v, int):
+                d3_add_node(d3_graph['nodes'], k, v)
+                d3_add_link(d3_graph['links'], k, e['__name'])
+            else:
+                d3_add_node(d3_graph['nodes'], k, 1)
+                d3_add_link(d3_graph['links'], k, e['__name'])
+                stack.append(v)
+
     f = open("d3-data.json", "w")
     f.write(json.dumps(d3_graph, indent = 4))
     f.close()
