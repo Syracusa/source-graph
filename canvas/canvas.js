@@ -125,6 +125,8 @@ function init() {
   console.log('mycanvas : ' + mycanvas)
   mycanvas.width = config["canvas_width"];
   mycanvas.height = config["canvas_height"];
+ 
+  /* TODO : Read from kernel graph json file */
   make_square_nodes(nodes, links, 5, 5, 50, 1)
   window.requestAnimationFrame(draw);
 }
