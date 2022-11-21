@@ -3,6 +3,8 @@ import json
 
 # Parse file and make dict
 
+KEYWORD = 'struct timespec'
+
 def is_leafnode(d: dict):
     if 'file' in d:
         return True
@@ -11,11 +13,14 @@ def is_leafnode(d: dict):
 def add_to_graph(g: dict, path : str, num: int):
     li = path.split('/')
     
-    fname = li[len(li) - 1]
+    # fname = li[len(li) - 1]
+    fname = path
     
     curr = g
+    dname = ''
     for idx in range(5, len(li) - 1):
-        dname = li[idx]
+        # dname = li[idx]
+        dname += '/' + li[idx]
         if not dname in curr:
             curr[dname] = { '__name' : dname }
         curr = curr[dname]
@@ -37,7 +42,7 @@ def get_graph(root : str):
     
     for path in Path(root).rglob('*.c'):
         ppath = path.as_posix()
-        c = kwdcount_file('struct timespec', ppath)
+        c = kwdcount_file(KEYWORD, ppath)
         if c > 10:
             print(f'{c} : {ppath}')
             add_to_graph(graph, ppath, c)
