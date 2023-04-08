@@ -5,29 +5,20 @@ import json
 
 KEYWORD = 'struct timespec'
 
-def is_leafnode(d: dict):
-    if 'file' in d:
-        return True
-    return False
-
 def add_to_graph(g: dict, path : str, num: int):
     li = path.split('/')
-    
-    # fname = li[len(li) - 1]
     fname = path
     
     curr = g
     dname = ''
     for idx in range(5, len(li) - 1):
-        # dname = li[idx]
+
         dname += '/' + li[idx]
         if not dname in curr:
             curr[dname] = { '__name' : dname }
         curr = curr[dname]
 
     curr[fname] = num
-    # curr['file'] = fname
-    # curr['count'] = num
 
 def kwdcount_file(kwd : str, p : str):
     c = 0
